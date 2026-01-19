@@ -1,0 +1,850 @@
+1.  Write a C program to Simulate the following CPU scheduling algorithms 
+a)	FCFS   b) SJF   c)Round Robin  d) Priority 
+a)	FCFS
+#include <stdio.h>
+int waitingtime(int proc[], int n,
+int burst_time[], int wait_time[])
+ {
+wait_time[0] = 0;
+for (int i = 1; i < n ; i++ )
+wait_time[i] = burst_time[i-1] + wait_time[i-1] ;
+return 0;
+}
+int turnaroundtime( int proc[], int n,int burst_time[], int wait_time[], int tat[]) 
+{
+int i;
+for ( i = 0; i < n ; i++)
+tat[i] = burst_time[i] + wait_time[i];
+return 0;
+}
+int avgtime( int proc[], int n, int burst_time[]) {
+int wait_time[n], tat[n], total_wt = 0, total_tat = 0;
+int i;
+waitingtime(proc, n, burst_time, wait_time);
+turnaroundtime(proc, n, burst_time, wait_time, tat);
+printf("Processes  Burst   Waiting Turn around \n");
+
+for ( i=0; i<n; i++) {
+total_wt = total_wt + wait_time[i];
+total_tat = total_tat + tat[i];
+printf(" %d\t  %d\t\t %d \t%d\n", i+1, burst_time[i], wait_time[i], tat[i]);
+}
+printf("Average waiting time = %f\n", (float)total_wt / (float)n);
+printf("Average turn around time = %f\n", (float)total_tat / (float)n);
+return 0;
+}
+int main() {
+int proc[] = { 1, 2, 3};
+int n = sizeof proc / sizeof proc[0];
+int burst_time[] = {5, 8, 12};
+avgtime(proc, n, burst_time);
+return 0;
+}
+	
+
+
+Output
+Processes   Burst   Waiting Turn around 
+ 1	        5		 0 	5
+ 2	        8		 5 	13
+ 3	      12		 13 	25
+Average waiting time = 6.000000
+Average turn around time = 14.333333
+
+b)	SJF
+#include<stdio.h>
+int main()
+{
+    int bt[20],p[20],wt[20],tat[20],i,j,n,total=0,totalT=0,pos,temp;
+    float avg_wt,avg_tat;
+    printf("Enter number of process:");
+    scanf("%d",&n);
+     printf("\nEnter Burst Time:\n");
+    for(i=0;i<n;i++)
+    {
+        printf("p%d:",i+1);
+        scanf("%d",&bt[i]);
+        p[i]=i+1;
+    }
+                          //sorting of burst times
+    for(i=0;i<n;i++)
+    {
+        pos=i;
+        for(j=i+1;j<n;j++)
+        {
+            if(bt[j]<bt[pos])
+                pos=j;
+        }
+        temp=bt[i];
+        bt[i]=bt[pos];
+        bt[pos]=temp;
+        temp=p[i];
+        p[i]=p[pos];
+        p[pos]=temp;
+    }
+ 
+    wt[0]=0;
+    //finding the waiting time of all the processes
+    for(i=1;i<n;i++)
+    {
+        wt[i]=0;
+        for(j=0;j<i;j++)
+             //individual WT by adding BT of all previous completed processes
+            wt[i]+=bt[j];
+           //total waiting time
+       total+=wt[i];   
+    }
+     //average waiting time
+    avg_wt=(float)total/n;  
+    printf("\nProcess\t Burst Time \tWaiting Time\tTurnaround Time");
+    for(i=0;i<n;i++)
+    {
+        //turnaround time of individual processes
+        tat[i]=bt[i]+wt[i]; 
+        //total turnaround time
+        totalT+=tat[i];      
+        printf("\np%d\t\t %d\t\t %d\t\t\t%d",p[i],bt[i],wt[i],tat[i]);
+    }
+      //average turnaround time
+    avg_tat=(float)totalT/n;     
+    printf("\n\nAverage Waiting Time=%f",avg_wt);
+    printf("\nAverage Turnaround Time=%f",avg_tat);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+c)	Round Robin
+d)	  
+e)	#include<stdio.h>
+f)	 
+g)	  int main()
+h)	  {
+i)	      int i, limit, total = 0, x, counter = 0, time_quantum;
+j)	      int wait_time = 0, turnaround_time = 0, arrival_time[10], burst_time[10], temp[10];
+k)	      float average_wait_time, average_turnaround_time;
+l)	      printf("nEnter Total Number of Processes:t");
+m)	      scanf("%d", &limit);
+n)	      x = limit;
+o)	      for(i = 0; i < limit; i++)
+p)	      {
+q)	            printf("nEnter Details of Process[%d]n", i + 1);
+r)	 
+s)	            printf("Arrival Time:t");
+t)	 
+u)	            scanf("%d", &arrival_time[i]);
+v)	 
+w)	            printf("Burst Time:t");
+x)	 
+y)	            scanf("%d", &burst_time[i]);
+z)	 
+aa)	            temp[i] = burst_time[i];
+bb)	      }
+cc)	 
+dd)	      printf("nEnter Time Quantum:t");
+ee)	      scanf("%d", &time_quantum);
+ff)	      printf("nProcess IDttBurst Timet Turnaround Timet Waiting Timen");
+gg)	      for(total = 0, i = 0; x != 0;)
+hh)	      {
+ii)	            if(temp[i] <= time_quantum && temp[i] > 0)
+jj)	            {
+kk)	                  total = total + temp[i];
+ll)	                  temp[i] = 0;
+mm)	                  counter = 1;
+nn)	            }
+oo)	            else if(temp[i] > 0)
+pp)	            {
+qq)	                  temp[i] = temp[i] - time_quantum;
+rr)	                  total = total + time_quantum;
+ss)	            }
+tt)	            if(temp[i] == 0 && counter == 1)
+uu)	            {
+vv)	                  x--;
+ww)	                  printf("nProcess[%d]tt%dtt %dttt %d", i + 1, burst_time[i], total - arrival_time[i], total - arrival_time[i] - burst_time[i]);
+xx)	                  wait_time = wait_time + total - arrival_time[i] - burst_time[i];
+yy)	                  turnaround_time = turnaround_time + total - arrival_time[i];
+zz)	                  counter = 0;
+aaa)	            }
+bbb)	            if(i == limit - 1)
+ccc)	            {
+ddd)	                  i = 0;
+eee)	            }
+fff)	            else if(arrival_time[i + 1] <= total)
+ggg)	            {
+hhh)	                  i++;
+iii)	            }
+jjj)	            else
+kkk)	            {
+lll)	                  i = 0;
+mmm)	            }
+nnn)	      }
+ooo)	 
+ppp)	      average_wait_time = wait_time * 1.0 / limit;
+qqq)	      average_turnaround_time = turnaround_time * 1.0 / limit;
+rrr)	      printf("nnAverage Waiting Time:t%f", average_wait_time);
+sss)	      printf("nAvg Turnaround Time:t%fn", average_turnaround_time);
+ttt)	      return 0;
+}
+OUTPUT:
+
+
+
+
+
+
+
+
+d)	Priority Scheduling
+#include<stdio.h>
+#include<conio.h>
+void main()
+ {
+   int x,n,p[10],pp[10],pt[10],w[10],t[10],awt,atat,i;
+   printf("Enter the number of process : ");
+   scanf("%d",&n);
+   printf("\n Enter process : time priorities \n");
+   for(i=0;i<n;i++)
+    {
+      printf("\nProcess no %d : ",i+1);
+      scanf("%d  %d",&pt[i],&pp[i]);
+      p[i]=i+1;
+    }
+  for(i=0;i<n-1;i++)
+   {
+     for(int j=i+1;j<n;j++)
+     {
+       if(pp[i]<pp[j])
+       {
+         x=pp[i];
+         pp[i]=pp[j];
+         pp[j]=x;
+         x=pt[i];
+         pt[i]=pt[j];
+         pt[j]=x;
+         x=p[i];
+         p[i]=p[j];
+         p[j]=x;
+      }
+   }
+}
+w[0]=0;
+awt=0;
+t[0]=pt[0];
+atat=t[0];
+for(i=1;i<n;i++)
+ {
+   w[i]=t[i-1];
+   awt+=w[i];
+   t[i]=w[i]+pt[i];
+   atat+=t[i];
+ }
+printf("\n\n Job \t Burst Time \t Wait Time \t Turn Around Time   Priority \n");
+for(i=0;i<n;i++)
+  printf("\n %d \t\t %d  \t\t %d \t\t %d \t\t %d \n",p[i],pt[i],w[i],t[i],pp[i]);
+awt/=n;
+atat/=n;
+printf("\n Average Wait Time : %d \n",awt);
+printf("\n Average Turn Around Time : %d \n",atat);
+getch();
+}
+OUTPUT : :
+Enter the number of process : 4
+
+ Enter process : time priorities
+
+Process no 1 : 3
+1
+
+Process no 2 : 4
+2
+Process no 3 : 5
+3
+Process no 4 : 6
+4
+ Job     Burst Time      Wait Time       Turn Around Time   Priority
+
+ 4               6               0               6               4
+
+ 3               5               6               11              3
+
+ 2               4               11              15              2
+
+ 1               3               15              18              1
+
+ Average Wait Time : 8
+
+ Average Turn Around Time : 12
+
+
+
+
+
+
+
+
+
+2. Write a C program to Simulate IPC techniques
+  b) Message Queues c) Shared memory
+a) Message Queues
+b1.c
+// C Program for Message Queue (Writer Process)
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#define MAX 10
+  
+// structure for message queue
+struct mesg_buffer {
+    long mesg_type;
+    char mesg_text[100];
+} message;
+  
+int main()
+{
+    key_t  key;
+    int msgid;
+  
+    // ftok to generate unique key
+    key = ftok("progfile", 65);
+  
+    // msgget creates a message queue
+    // and returns identifier
+    msgid = msgget(key, 0666 | IPC_CREAT);
+    message.mesg_type = 1;
+  
+    printf("Write Data : ");
+    fgets(message.mesg_text,MAX,stdin);
+  
+    // msgsnd to send message
+    msgsnd(msgid, &message, sizeof(message), 0);
+  
+    // display the message
+    printf("Data send is : %s \n", message.mesg_text);
+  
+    return 0;
+}
+
+b2.c
+// C Program for Message Queue (Reader Process)
+#include <stdio.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+  
+// structure for message queue
+struct mesg_buffer {
+    long mesg_type;
+    char mesg_text[100];
+} message;
+  
+int main()
+{
+    key_t key;
+    int msgid;
+  
+    // ftok to generate unique key
+    key = ftok("progfile", 65);
+  
+    // msgget creates a message queue
+    // and returns identifier
+    msgid = msgget(key, 0666 | IPC_CREAT);
+  
+    // msgrcv to receive message
+    msgrcv(msgid, &message, sizeof(message), 1, 0);
+  
+    // display the message
+    printf("Data Received is : %s \n", message.mesg_text);
+  
+    // to destroy the message queue
+    msgctl(msgid, IPC_RMID, NULL);
+  
+    return 0;
+}
+
+Output:
+ 
+
+ b)Shared Memory
+#include<unistd.h>
+#include<stdio.h>
+#include<stdlib.h>
+int main(void)
+{
+int numbytes;
+int fd[2];
+pid_t pid;
+char line[1024];
+if(pipe(fd)<0)
+{
+printf("pipe error");
+exit(0);
+}
+if((pid=fork())<0)
+{
+printf("fork error");
+exit(0);
+}
+else if(pid>0)
+{
+close(fd[0]);
+write(fd[1],"howdy\n",6);
+}
+else
+{
+close(fd[1]);
+numbytes=read(fd[0],line,1024);
+write(STDOUT_FILENO,line,numbytes);
+}
+exit(0);
+}
+
+Output
+
+Howdy
+3. Write a C Program to Simulate Classical Problems of Synchronization
+     a) Readers-Writers b) Producers-Consumers C) Dining Philosophers
+ 
+a)	Dining Philosophers
+#include<stdio.h>
+#include<stdlib.h>
+#include<pthread.h>
+#include<semaphore.h>
+#include<unistd.h>
+
+sem_t room;
+sem_t chopstick[5];
+
+void * philosopher(void *);
+void eat(int);
+int main()
+{
+int i,a[5];
+pthread_t tid[5];
+
+sem_init(&room,0,4);
+
+for(i=0;i<5;i++)
+sem_init(&chopstick[i],0,1);
+
+for(i=0;i<5;i++){
+a[i]=i;
+pthread_create(&tid[i],NULL,philosopher,(void *)&a[i]);
+}
+for(i=0;i<5;i++)
+pthread_join(tid[i],NULL);
+}
+void * philosopher(void * num)
+{
+int phil=*(int *)num;
+sem_wait(&room);
+printf("\nPhilosopher %d has entered room",phil);
+sem_wait(&chopstick[phil]);
+sem_wait(&chopstick[(phil+1)%5]);
+eat(phil);
+sleep(2);
+printf("\nPhilosopher %d has finished eating",phil);
+sem_post(&chopstick[(phil+1)%5]);
+sem_post(&chopstick[phil]);
+sem_post(&room);
+}
+void eat(int phil)
+{
+printf("\nPhilosopher %d is eating",phil);
+}
+
+
+
+
+4. Write a C Program to simulate Bankers Algorithm for Dead Lock Avoidance.
+#include<stdio.h>
+void main() 
+{
+int k=0,output[10],d=0,t=0,ins[5],i,avail[5],allocated[10][5],need[10][5],MAX[10][5],pno,P[10],j,rz, count=0;
+printf("\n Enter the number of resources : ");
+scanf("%d", &rz);
+printf("\n enter the max instances of each resources\n");
+for (i=0;i<rz;i++) {
+avail[i]=0;
+printf("%c= ",(i+97));
+scanf("%d",&ins[i]);
+}
+printf("\n Enter the number of processes : ");
+scanf("%d", &pno);
+printf("\n Enter the allocation matrix \n     ");
+for (i=0;i<rz;i++)
+printf(" %c",(i+97));
+printf("\n");
+for (i=0;i <pno;i++) {
+P[i]=i;
+printf("P[%d]  ",P[i]);
+for (j=0;j<rz;j++) {
+scanf("%d",&allocated[i][j]);
+avail[j]+=allocated[i][j];
+}
+}
+printf("\nEnter the MAX matrix \n     ");
+for (i=0;i<rz;i++) {
+printf(" %c",(i+97));
+avail[i]=ins[i]-avail[i];
+}
+printf("\n");
+for (i=0;i <pno;i++) {
+printf("P[%d]  ",i);
+for (j=0;j<rz;j++)
+scanf("%d",&MAX[i][j]);
+}
+printf("\n");
+A: d=-1;
+for (i=0;i<pno;i++) {
+count=0;
+t=P[i];
+for (j=0;j<rz;j++) {
+need[t][j] = MAX[t][j]-allocated[t][j];
+if(need[t][j]<=avail[j])
+count++;
+}
+if(count==rz) {
+output[k++]=P[i];
+for (j=0;j<rz;j++)
+avail[j]+=allocated[t][j];
+} else
+P[++d]=P[i];
+}
+if(d!=-1) {
+pno=d+1;
+goto A;
+}
+printf("\t <");
+for (i=0;i<k;i++)
+printf(" P[%d] ",output[i]);
+printf(">");
+}
+
+Output
+ Enter the number of resources : 3
+
+ Enter the max instances of each resources
+a= 10
+b= 5
+c= 7
+
+ Enter the number of processes : 5
+ Enter the allocation matrix 
+         a b c
+P[0]  0 1 0
+P[1]  2 0 0
+P[2]  3 0 2
+P[3]  2 1 1
+P[4]  0 0 2
+Enter the MAX matrix 
+         a b c
+P[0]  7 5 3
+P[1]  3 2 2
+P[2]  9 0 2
+P[3]  2 2 2
+P[4]  4 3 3
+	 < P[1]  P[3]  P[4]  P[0]  P[2] >(base)
+5. Write a C Programs to simulate all page replacement algorithms 
+a) FIFO b) LRU c) Optimal
+
+a)	FIFO
+#include<stdio.h>
+#include<conio.h>
+ int main()
+{
+int i, j, k, f, pf=0, count=0, rs[25], m[10], n;
+printf("\n Enter the length of reference string -- ");scanf("%d",&n);
+printf("\n Enter the reference string -- ");
+for(i=0;i<n;i++)
+scanf("%d",&rs[i]);
+printf("\n Enter no. of frames -- ");
+scanf("%d",&f);
+for(i=0;i<f;i++)
+m[i]=-1;
+printf("\n The Page Replacement Process is -- \n");
+for(i=0;i<n;i++)
+{
+for(k=0;k<f;k++)
+{
+if(m[k]==rs[i])
+break;
+}
+if(k==f)
+{
+m[count++]=rs[i];
+pf++;
+}
+for(j=0;j<f;j++)
+printf("\t%d",m[j]);
+if(k==f)
+printf("\tPF No. %d",pf);
+printf("\n");
+if(count==f)
+count=0;
+}
+printf("\n The number of Page Faults using FIFO are %d",pf);
+
+}
+
+
+
+
+
+
+
+
+Output
+Enter the length of reference string – 20
+Enter the reference string --
+Enter no. of frames --
+7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7 0 1
+3
+The Page Replacement Process is –
+7 -1 -1 PF No. 1
+7 0 -1 PF No. 2
+7 0 1 PF No. 3
+2 0 1 PF No. 4
+2 0 1 2 3 1 PF No. 5
+2 3 0 PF No. 6
+4 3 0 PF No. 7
+4 2 0 PF No. 8
+4 2 3 PF No. 9
+0 2 3 PF No. 10
+0 2 3 0 2 3 0 1 3 PF No. 11
+0 1 2 PF No. 12
+0 1 2 0 1 2 7 1 2 PF No. 13
+7 0 2 PF No. 14
+7 0 1 PF No. 15
+The numbers of Page Faults using FIFO are 15
+
+
+b) LRU
+#include<stdio.h>
+ 
+int findLRU(int time[], int n){
+int i, minimum = time[0], pos = 0;
+ 
+for(i = 1; i < n; ++i){
+if(time[i] < minimum){
+minimum = time[i];
+pos = i;
+}
+}
+return pos;
+}
+ 
+int main()
+{
+    int no_of_frames, no_of_pages, frames[10], pages[30], counter = 0, time[10], flag1, flag2, i, j, pos, faults = 0;
+printf("Enter number of frames: ");
+scanf("%d", &no_of_frames);
+printf("Enter number of pages: ");
+scanf("%d", &no_of_pages);
+printf("Enter reference string: ");
+    for(i = 0; i < no_of_pages; ++i){
+     scanf("%d", &pages[i]);
+    }
+    
+for(i = 0; i < no_of_frames; ++i){
+     frames[i] = -1;
+    }
+    
+    for(i = 0; i < no_of_pages; ++i){
+     flag1 = flag2 = 0;
+    
+     for(j = 0; j < no_of_frames; ++j){
+     if(frames[j] == pages[i]){
+     counter++;
+     time[j] = counter;
+   flag1 = flag2 = 1;
+   break;
+   }
+     }
+    
+     if(flag1 == 0){
+for(j = 0; j < no_of_frames; ++j){
+     if(frames[j] == -1){
+     counter++;
+     faults++;
+     frames[j] = pages[i];
+     time[j] = counter;
+     flag2 = 1;
+     break;
+     }
+     }
+     }
+    
+     if(flag2 == 0){
+     pos = findLRU(time, no_of_frames);
+     counter++;
+     faults++;
+     frames[pos] = pages[i];
+     time[pos] = counter;
+     }
+    
+     printf("\n");
+    
+     for(j = 0; j < no_of_frames; ++j){
+     printf("%d\t", frames[j]);
+     }
+}
+printf("\n\nTotal Page Faults = %d", faults);
+    
+    return 0;
+}
+
+OUTPUT
+
+Enter the length of reference string – 20
+Enter the reference string --7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7 0 1
+Enter no. of frames --3
+The Page Replacement Process is –
+7 -1 -1 PF No. 1
+7 0 -1 PF No. 2
+7 0 1 PF No. 3
+2 0 1 PF No. 4
+2 0 1 2 3 1 PF No. 5
+2 3 0 PF No. 6
+4 3 0 PF No. 7
+4 2 0 PF No. 8
+4 2 3 PF No. 9
+0 2 3 PF No. 10
+0 2 3 0 2 3 0 1 3 PF No. 11
+0 1 2 PF No. 12
+0 1 2 0 1 2 7 1 2 PF No. 13
+7 0 2 PF No. 14
+7 0 1 PF No. 15
+The numbers of Page Faults using LRU  are
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6. Write a C program to simulate Disk Scheduling Algorithms
+     a) FCFS    b) SSTF c)SCAN d)LOOK
+
+a)	FCFS
+
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+    int RQ[100],i,n,TotalHeadMoment=0,initial;
+    printf("Enter the number of Requests\n");
+    scanf("%d",&n);
+    printf("Enter the Requests sequence\n");
+    for(i=0;i<n;i++)
+     scanf("%d",&RQ[i]);
+    printf("Enter initial head position\n");
+    scanf("%d",&initial);
+    // logic for FCFS disk scheduling
+    for(i=0;i<n;i++)
+    {
+        TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+        initial=RQ[i];
+    }
+    
+    printf("Total head moment is %d",TotalHeadMoment);
+    return 0;
+    
+}
+Output
+Enter the number of Request
+8
+Enter the Requests Sequence
+95 180 34 119 11 123 62 64
+Enter initial head position
+50
+Total head movement is 644
+
+b)	SSTF
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+    int RQ[100],i,n,TotalHeadMoment=0,initial,count=0;
+    printf("Enter the number of Requests\n");
+    scanf("%d",&n);
+    printf("Enter the Requests sequence\n");
+    for(i=0;i<n;i++)
+     scanf("%d",&RQ[i]);
+    printf("Enter initial head position\n");
+    scanf("%d",&initial);
+   // logic for sstf disk scheduling
+  /* loop will execute until all process is completed*/
+    while(count!=n)
+    {
+        int min=1000,d,index;
+        for(i=0;i<n;i++)
+        {
+           d=abs(RQ[i]-initial);
+           if(min>d)
+           {
+               min=d;
+               index=i;
+           }
+       }
+        TotalHeadMoment=TotalHeadMoment+min;
+        initial=RQ[index];
+        // 1000 is for max
+        // you can use any number
+        RQ[index]=1000;
+        count++;
+    }
+   printf("Total head movement is %d",TotalHeadMoment);
+    return 0;
+}
+OUTPUT
+Enter the number of Request
+8
+Enter Request Sequence
+95 180 34 119 11 123 62 64
+Enter initial head Position
+50
+Total head movement is 236
+
+
+
+
+
+
+
